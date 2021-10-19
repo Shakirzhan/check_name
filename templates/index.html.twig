@@ -65,16 +65,19 @@
             processData: false,
             success: function (data) {
                 console.log(data);
-                if(data.status === 'success') {
+                if(data && data.status === 'success') {
                     //$('.lll').append(`<li>${data.result} ${data.status}</li>`);
-                    $('.lll').append('<li>Результат готов</li>');
+                    $('.lll').append(`<li>Ваша фотография подходит ${Number(data.result).toFixed(2)} %</li>`);
                 }
-                if(data.status === 'ready') {
+                if(data && data.status === 'ready') {
                     $('.lll').append('<li>Была выполнена</li>');
                 }
-                if(data.status === 'wait') {
-                $('.lll').append('<li>Требуется время</li>');
+                if(data && data.status === 'wait') {
+                    $('.lll').append('<li>Требуется время</li>');
                     $('#task_id').val(data.retry_id)
+                }
+                if(!data) {
+                    $('.lll').append('<li>Не получилось</li>');
                 }
             },
             error: function (data) {
@@ -97,18 +100,18 @@
             url: formGET.attr('action')+taskId,
             success: function (data) {
                 console.log(data);
-                if(data.status === 'success') {
+                if(data && data.status === 'success') {
                     //$('.success').append(`<li>${data.result} ${data.status}</li>`);
-                    $('.success').append('<li>Результат готов</li>');
+                    $('.success').append(`<li>Ваша фотография подходит ${Number(data.result).toFixed(2)} %</li>`);
                 }
-                if(data.status === 'wait') {
+                if(data && data.status === 'wait') {
                     //$('.wait').append(`<li>${data.retry_id} ${data.status}</li>`);
                     $('.wait').append('<li>Результат еще не готов</li>');
                 }
-                if(data.status === 'not_found') {
+                if(data && data.status === 'not_found') {
                     $('.not').append('<li>Задача с таким номером не найдена </li>');
                 }
-                if(data.status === 'error') {
+                if(data && data.status === 'error') {
                     $('.not').append('<li>Задача с таким номером не найдена </li>');
                 }
             },
