@@ -22,6 +22,20 @@
         <input type="submit" value="Отправить" />
     </div>
 </form>
+<div>wait</div>
+<ul class="wait">
+  
+</ul>
+
+<div>success</div>
+<ul class="success">
+  
+</ul>
+
+<div>not found</div>
+<ul class="not">
+  
+</ul>
 
 <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
 
@@ -44,9 +58,14 @@
             success: function (data) {
                 console.log(data);
                 if(data.status === 'success') {
-                    $('.lll').append(`<li>${data.result} ${data.status}</li>`);
+                    //$('.lll').append(`<li>${data.result} ${data.status}</li>`);
+                    $('.lll').append('<li>Результат готов</li>');
+                }
+                if(data.status === 'ready') {
+                    $('.lll').append('<li>Была выполнена</li>');
                 }
                 if(data.status === 'wait') {
+                $('.lll').append('<li>Требуется время</li>');
                     $('#task_id').val(data.retry_id)
                 }
             },
@@ -70,6 +89,20 @@
             url: formGET.attr('action')+taskId,
             success: function (data) {
                 console.log(data);
+                if(data.status === 'success') {
+                    //$('.success').append(`<li>${data.result} ${data.status}</li>`);
+                    $('.success').append('<li>Результат готов</li>');
+                }
+                if(data.status === 'wait') {
+                    //$('.wait').append(`<li>${data.retry_id} ${data.status}</li>`);
+                    $('.wait').append('<li>Результат еще не готов</li>');
+                }
+                if(data.status === 'not_found') {
+                    $('.not').append('<li>Задача с таким номером не найдена </li>');
+                }
+                if(data.status === 'error') {
+                    $('.not').append('<li>Задача с таким номером не найдена </li>');
+                }
             },
             error: function (data) {
             },

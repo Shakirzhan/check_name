@@ -11,6 +11,7 @@ use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use App\Entity\Image;
 
 class CheckController extends AbstractController
 {
@@ -24,7 +25,9 @@ class CheckController extends AbstractController
     private function upload(UploadedFile $file)
     {
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+
         $safeFilename = $this->slugger->slug($originalFilename);
+
         $fileName = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
 
         $path = $_SERVER['DOCUMENT_ROOT'] . '/img/';
@@ -44,11 +47,15 @@ class CheckController extends AbstractController
 
     public function check(Request $request)
     {
+        $r = new Response();
+
         $name = $request->request->get('name');
 
         $file = $request->files->get('photo');
 
         $file = $this->upload($file);
+
+        $fileName = $_FILES['photo']['name'];
         
         $formFields = [
             'name' => $name,
@@ -59,7 +66,19 @@ class CheckController extends AbstractController
 
     
         $httpClient = HttpClient::create();
-   
+
+        $repository = $this->getDoctrine()->getRepository(Image::class);
+
+        $imgFind = $repository->findBy([
+            'name' => $fileName
+        ]);
+
+        if(count($imgFind)) {
+            return $r->setContent(json_encode([
+                'status' => 'ready'
+            ]));
+        }
+
         $response = $httpClient
         ->request('POST', 'http://merlinface.com:12345/api/', [
             'headers' => $formData->getPreparedHeaders()->toArray(),
@@ -69,7 +88,15 @@ class CheckController extends AbstractController
 
         $response = json_decode($response);
 
-        $r = new Response();
+        $entityManager = $this->getDoctrine()->getManager();
+
+        $image = new Image();
+
+        $image->setName($fileName);
+
+        $entityManager->persist($image);
+
+        $entityManager->flush();
 
         return $r->setContent(json_encode($response));
     }
