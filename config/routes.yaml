@@ -1,3 +1,13 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+index:
+   path: /
+   controller: App\Controller\DefaultController::index
+api_post_check:
+    path: /api/check
+    controller: App\Controller\CheckController::check
+    methods: POST
+    format: json
+api_get_check:
+    path: /api/get-check/{hash}
+    controller: App\Controller\CheckController::getCheck
+    methods: GET
+    format: json

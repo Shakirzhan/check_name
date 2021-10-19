@@ -1,0 +1,78 @@
+<form id="form" action="./api/check" method="post">
+    <div>
+        <input type="text" name="name" placeholder="Имя" id="name" />
+    </div>
+    <div style="margin-top: 10px;">
+        <input id="file" type="file" name="photo">
+    </div>
+    <div style="margin-top: 10px;"> 
+        <input type="submit" value="Отправить" />
+    </div>
+</form>
+
+<ul class="lll">
+  
+</ul>
+
+<form id="formGET" action="./api/get-check/" method="get">
+    <div style="margin-top: 10px;">
+        <input id="task_id" type="text" name="task_id" disabled>
+    </div>
+    <div style="margin-top: 10px;"> 
+        <input type="submit" value="Отправить" />
+    </div>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+
+<script type="text/javascript">
+    var frm = $('#form');
+
+    frm.submit(function (e) {
+  
+        e.preventDefault();
+
+        var data = new FormData(frm[0]);
+    
+        $.ajax({
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                console.log(data);
+                if(data.status === 'success') {
+                    $('.lll').append(`<li>${data.result} ${data.status}</li>`);
+                }
+                if(data.status === 'wait') {
+                    $('#task_id').val(data.retry_id)
+                }
+            },
+            error: function (data) {
+            },
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    var formGET = $('#formGET');
+
+    formGET.submit(function (e) {
+  
+        e.preventDefault();
+
+        const taskId = $('#task_id').val()
+
+        $.ajax({
+            type: formGET.attr('method'),
+            url: formGET.attr('action')+taskId,
+            success: function (data) {
+                console.log(data);
+            },
+            error: function (data) {
+            },
+        });
+    });
+</script>
