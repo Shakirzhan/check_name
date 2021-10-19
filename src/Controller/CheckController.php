@@ -12,6 +12,7 @@ use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use App\Entity\Image;
+use App\Entity\Response as GetResponse;
 
 class CheckController extends AbstractController
 {
@@ -88,17 +89,43 @@ class CheckController extends AbstractController
 
         $response = json_decode($response);
 
+        $this->saveImage($fileName);
+
+        $this->saveResponse($response);
+
+        return $r->setContent(json_encode($response));
+    }
+
+    private function saveImage($name) {
         $entityManager = $this->getDoctrine()->getManager();
 
         $image = new Image();
 
-        $image->setName($fileName);
+        $image->setName($name);
 
         $entityManager->persist($image);
 
         $entityManager->flush();
+    }
 
-        return $r->setContent(json_encode($response));
+    private function saveResponse($response) {
+        if(!$response) {
+            return;
+        }
+
+        $set = $this->getDoctrine()->getManager();
+
+        $result = new GetResponse();
+
+        $result->setResult($response->result);
+
+        $result->setStatus($response->status);
+
+        $result->setRetryId($response->retry_id);
+
+        $set->persist($result);
+
+        $set->flush();
     }
 
     public function getCheck(Request $request, $hash) 
@@ -120,6 +147,8 @@ class CheckController extends AbstractController
         ->getContent(false);
 
         $response = json_decode($response);
+
+        $this->saveResponse($response);
 
         $r = new Response();
 

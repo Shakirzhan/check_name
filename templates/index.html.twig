@@ -47,7 +47,15 @@
         e.preventDefault();
 
         var data = new FormData(frm[0]);
-    
+        // result, status, retry_id
+        if( !$('#file').val() ) {
+            alert('Загрузите фото');
+            return;
+        }
+        if( !$('#name').val() ) {
+            alert('Заполните имя');
+            return;
+        }
         $.ajax({
             type: frm.attr('method'),
             url: frm.attr('action'),
